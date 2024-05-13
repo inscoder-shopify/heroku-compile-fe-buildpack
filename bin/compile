@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+# Ensure wildcards in globs match dotfiles too.
+shopt -s dotglob
+
+BUILD_DIR=${1:-}
+CACHE_DIR=${2:-}
+ENV_DIR=${3:-}
+
+
+if [ -f $ENV_DIR/FRONTEND_PATH ]; then
+	FRONTEND_PATH=`cat $ENV_DIR/FRONTEND_PATH`
+
+	if [ -d $FRONTEND_PATH ]; then
+
+    echo "-----> Compile frontend buildpack in $FRONTEND_PATH"
+    cd $FRONTEND_PATH
+    echo "       frontend buildpack: npm install"
+    npm install
+    echo "       frontend buildpack: npm run build"
+    npm run build
+    cd ..
+    echo "       frontend buildpack: rake build:all"
+    bundle exec rake build:all
+		exit 0
+	fi
+fi
+
+echo "FRONTEND_PATH is undefined"
+exit 1
